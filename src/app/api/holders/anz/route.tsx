@@ -1,9 +1,8 @@
 import { PublicKey } from '@solana/web3.js';
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 
 // Solana ANZ = DyHBav1hXTWR2kQqWzLgsjVtS1x7dJF1cF3Zf83DCTni
-export async function GET(request: Request) {
-
+export async function GET(request: NextRequest) {
     const mint = new PublicKey('DyHBav1hXTWR2kQqWzLgsjVtS1x7dJF1cF3Zf83DCTni');
     const url = process.env.RPC || 'https://api.mainnet-beta.solana.com';
 
@@ -47,10 +46,34 @@ export async function GET(request: Request) {
             results: assetList,
         };
 
-        return NextResponse.json(resultData);
+        return new NextResponse(JSON.stringify(resultData), {
+            status: 200,
+            headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+            },
+        });
 
     } catch (error) {
-        return NextResponse.json({ message: 'Error fetching nft holders' }, { status: 500 });
+        return new NextResponse(JSON.stringify({ message: 'Error fetching nft holders' }), {
+            status: 500,
+            headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+            },
+        });
     }
 }
 
+export async function OPTIONS(request: NextRequest) {
+    return new NextResponse(null, {
+        status: 204,
+        headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        },
+    });
+}
